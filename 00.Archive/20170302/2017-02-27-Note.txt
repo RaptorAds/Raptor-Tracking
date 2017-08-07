@@ -1,0 +1,12 @@
+Summary by Campaign
+	- Total Sub
+	- Cost
+	- Revenue
+	- Sum(revenue) - Sum(Cost) = Profit
+	- Separated by Carrier (AIS, DTAC, True)
+Summary by Offer
+	- Total Sub
+	- Cost
+	- Revenue
+	- Sum(revenue) - Sum(Cost) = Profit
+	- Separated by Carrier (AIS, DTAC, True)

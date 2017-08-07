@@ -1,0 +1,9 @@
+/*/////PHP Grid Style/////*/
+/* increase font & row height */
+.ui-jqgrid *, .ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-size:12px; }
+.ui-jqgrid tr.jqgrow td { height:30px; }
+
+/* big toolbar icons */
+.ui-jqgrid .ui-jqgrid-pager .ui-pg-div span.ui-icon { margin: 4px; }
+.ui-jqgrid .ui-jqgrid-pager { height: 32px; }
+.ui-jqgrid .ui-jqgrid-pager .ui-pg-div { line-height: 25px; }

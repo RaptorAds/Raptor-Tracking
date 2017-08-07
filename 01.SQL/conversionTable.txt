@@ -1,0 +1,238 @@
+CREATE TABLE `raptortracking`.`conversion` (
+`advertiserId` varchar(255),
+`advertiserName` varchar(255),
+`affiliateNetworkId` varchar(255),
+`affiliateNetworkName` varchar(255),
+`appendClickIdToOfferUrl` varchar(255),
+`applicationBundle` varchar(255),
+`applicationId` varchar(255),
+`applicationName` varchar(255),
+`brand` varchar(255),
+`browser` varchar(255),
+`browserVersion` varchar(255),
+`campaignCountry` varchar(255),
+`campaignId` varchar(255),
+`campaignName` varchar(255),
+`campaignNamePostfix` varchar(255),
+`campaignUrl` varchar(500),
+`city` varchar(255),
+`clickId` varchar(255),
+`clickIdArgument` varchar(255),
+`clickRedirectType` varchar(255),
+`clientId` varchar(255),
+`connectionType` varchar(255),
+`connectionTypeName` varchar(255),
+`conversionActionId` varchar(255),
+`conversionActionName` varchar(255),
+`conversionType` varchar(255),
+`conversions` varchar(255),
+`cost` varchar(255),
+`costArgument` varchar(255),
+`costModel` varchar(255),
+`countryCode` varchar(255),
+`countryName` varchar(255),
+`cpa` varchar(255),
+`cpc` varchar(255),
+`cpm` varchar(255),
+`device` varchar(255),
+`deviceName` varchar(255),
+`externalCampaignId` varchar(255),
+`externalId` varchar(255),
+`flowId` varchar(255),
+`flowName` varchar(255),
+`ip` varchar(255),
+`isp` varchar(255),
+`landerCountry` varchar(255),
+`landerId` varchar(255),
+`landerName` varchar(255),
+`landerUrl` varchar(500),
+`mobileCarrier` varchar(255),
+`model` varchar(255),
+`numberOfOffers` varchar(255),
+`offerCountry` varchar(255),
+`offerId` varchar(255),
+`offerName` varchar(255),
+`offerUrl` varchar(500),
+`onlyWhitelistedPostbackIps` varchar(255),
+`os` varchar(255),
+`osVersion` varchar(255),
+`payout` varchar(255),
+`pixelUrl` varchar(500),
+`postbackTimestamp` varchar(25),
+`postbackUrl` varchar(500),
+`profit` varchar(255),
+`publisherId` varchar(255),
+`publisherName` varchar(255),
+`referrer` varchar(500),
+`referrerDomain` varchar(255),
+`region` varchar(255),
+`registrationHour` varchar(255),
+`revenue` varchar(255),
+`roi` varchar(255),
+`siteId` varchar(255),
+`trafficSourceId` varchar(255),
+`trafficSourceName` varchar(255),
+`transactionId` varchar(255),
+`type` varchar(255),
+`visitTimestamp` varchar(25)
+);
+CREATE UNIQUE INDEX clickIdIndex
+ON conversion (clickId);
+CREATE INDEX trafficSourceIdIndex
+ON conversion (trafficSourceId);
+CREATE INDEX transactionIdIndex
+ON conversion (transactionId);
+CREATE INDEX externalIdIndex
+ON conversion (externalId);
+CREATE INDEX publisherIdIndex
+ON conversion (publisherId);
+CREATE INDEX postbackTimestampIndex
+ON conversion (postbackTimestamp);
+
+CREATE TABLE `raptortracking`.`duplicateLog` (
+`transactionId` varchar(255),
+`campaignName` varchar(255),
+`postbackTimestamp` varchar(30),
+`year` varchar(10),
+`month` varchar(10),
+`day` varchar(10)
+);
+CREATE UNIQUE INDEX transactionIdIndex
+ON duplicateLog (transactionId, postbackTimestamp);
+
+CREATE TABLE `raptortracking`.`conversion_campaign_sum` (
+`campaignName` varchar(255),
+`mobileCarrier` varchar(50),
+`year` varchar(10),
+`month` varchar(10),
+`day` varchar(10),
+`cost` decimal(18,2),
+`revenue` decimal(18,2),
+`profit` decimal(18,2),
+`totalsub` varchar(255)
+);
+CREATE UNIQUE INDEX campaignNameIndex
+ON conversion_campaign_sum (campaignName, mobileCarrier, year, month, day);
+
+CREATE TABLE `raptortracking`.`conversion_offer_sum` (
+`offerName` varchar(255),
+`mobileCarrier` varchar(50),
+`year` varchar(10),
+`month` varchar(10),
+`day` varchar(10),
+`cost` decimal(18,2),
+`revenue` decimal(18,2),
+`profit` decimal(18,2),
+`Total` varchar(255)
+);
+CREATE UNIQUE INDEX offerNameIndex
+ON conversion_campaign_sum (offerName, mobileCarrier, year, month, day);
+
+CREATE TABLE `raptortracking`.`campaignStat` (
+`campaignName` varchar(255),
+`visits` bigint,
+`clicks` bigint,
+`conversions` bigint,
+`year` varchar(10),
+`month` varchar(10),
+`day` varchar(10)
+);
+CREATE UNIQUE INDEX statIndex
+ON campaignStat (`campaignName`, `year`, `month`, `day`);
+
+CREATE TABLE `raptortracking`.`temp_campaignStat_sum` (
+`campaignName` varchar(255),
+`visits` bigint,
+`clicks` bigint,
+`conversions` bigint
+);
+
+CREATE TABLE `raptortracking`.`temp_conversion_campaign_sum` (
+`campaignName` varchar(255),
+`AIS` bigint,
+`DTAC` bigint,
+`TRUE` bigint,
+`Others` bigint,
+`Total` bigint,
+`Cost` decimal(18,2),
+`Revenue` decimal(18,2),
+`Profit` decimal(18,2),
+`Payout` decimal(18,2)
+);
+
+CREATE VIEW conversion_sum AS
+select
+	offerName
+	, Case When mobileCarrier != '' Then mobileCarrier Else 'Other' End as mobileCarrier
+	, Year(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p')) as 'Year'
+    , Month(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p')) as 'Month'
+	, Day(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p')) as 'Day'
+	, Round(Sum(Cost), 2) as Cost
+    , Round(Sum(Revenue), 2) as Revenue
+    , Round(Sum(Revenue), 2) - Round(Sum(Cost), 2) as Profit
+	, count(*) as Total
+from
+	conversion
+where
+	STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p') >= (curdate() + INTERVAL 1 DAY - INTERVAL 1 MONTH)
+group by
+	offerName
+	, mobileCarrier
+    , Year(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p'))
+    , Month(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p'))
+    , Day(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p'))
+order by
+	offername
+	, mobileCarrier
+
+CREATE VIEW conversion_sum_carrier AS
+SELECT offerName
+     , Case when mobileCarrier = 'AIS' then total end as "AIS"
+     , Case when mobileCarrier = 'DTAC' then total end as "DTAC"
+     , Case when mobileCarrier like '%True%' then total end as "TRUE"
+	 , Case when NULLIF(mobileCarrier, ' ') IS NULL then total end as "Others"
+FROM   conversion_sum
+GROUP  BY offerName;
+
+CREATE VIEW conversion_duplicate AS
+SELECT 
+	transactionId
+    , Year(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p')) as 'Year'
+    , Month(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p')) as 'Month'
+    , Day(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p')) as 'Day'
+    , COUNT(*) as TotalCount
+FROM conversion
+WHERE
+	transactionId <> ''
+	and created >= curdate() - INTERVAL 1 DAY
+GROUP BY 
+	transactionId
+	, Year(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p'))
+    , Month(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p'))
+	, Day(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p'))
+HAVING COUNT(*) > 1
+ORDER BY COUNT(*) DESC;
+
+
+CREATE VIEW conversion_campaignsum as
+select
+	campaignName
+	, Case When mobileCarrier != '' Then mobileCarrier Else 'Other' End as mobileCarrier
+	, Year(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p')) as 'Year'
+    , Month(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p')) as 'Month'
+	, Day(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p')) as 'Day'
+    , Round(Sum(Cost), 2) as Cost
+    , Round(Sum(Revenue), 2) as Revenue
+    , Round(Sum(Revenue), 2) - Round(Sum(Cost), 2) as Profit
+	, COUNT(*) as TotalSub
+from
+	conversion
+where
+	STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p') >= (curdate() + INTERVAL 1 DAY - INTERVAL 1 WEEK)
+group by
+	campaignName
+	, mobileCarrier
+    , Year(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p'))
+    , Month(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p'))
+    , Day(STR_TO_DATE(postbackTimestamp,'%Y-%m-%d %h:%i:%s %p'))
+    
