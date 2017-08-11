@@ -265,7 +265,9 @@
 	
 	#Update 20170328 - Add Update Summary Table Query
 	$sql = "";
-	$sql = "RESET QUERY CACHE;
+	$sql = "
+			SET GLOBAL innodb_buffer_pool_size=402653184;
+			RESET QUERY CACHE;
 			FLUSH QUERY CACHE;
 			insert into conversion_campaign_sum (campaignName, mobileCarrier, `year`, `month`, `day`, cost, revenue, profit, totalsub)
 			select
