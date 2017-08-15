@@ -1,9 +1,9 @@
 <html>
 <title>RaptorAds Tracking Report </title>
 <?php
-	$login = "95bfcd30-ffdd-48fa-8fe1-0ff3601defec:01KSv1g6IhtPe9zOWYKcgDQvp6KIGEnu9WEz";
+	$login = "33f90ed3-9d81-48b6-9b31-d5676ce7b6ec:2qkgdoiK7Ulo2ioaZN47ZqQbEdtKIUG6ljRY";
 	$service_url = 'https://api.voluum.com/auth/access/session';
-	$data = array("accessId" => "95bfcd30-ffdd-48fa-8fe1-0ff3601defec", "accessKey" => "01KSv1g6IhtPe9zOWYKcgDQvp6KIGEnu9WEz");
+	$data = array("accessId" => "33f90ed3-9d81-48b6-9b31-d5676ce7b6ec", "accessKey" => "2qkgdoiK7Ulo2ioaZN47ZqQbEdtKIUG6ljRY");
 	
 	$curl_post_data = json_encode($data); 
 	
